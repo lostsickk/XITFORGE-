@@ -67,12 +67,9 @@
     font-weight:800;letter-spacing:1.6px;transition:.15s}
   .go:active{filter:brightness(.92);transform:scale(.99)}
   .go:disabled{filter:brightness(.5);cursor:default;transform:none}
-  .hint{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:#6a6a6a;
-    margin-top:16px;text-transform:uppercase;min-height:15px}
-  .genlink{display:block;margin:18px auto 0;background:none;border:0;color:#e5483f;font-family:inherit;
-    font-size:11.5px;font-weight:800;letter-spacing:1.6px;cursor:pointer;text-transform:uppercase}
-  .wdlink{display:block;margin:12px auto 0;background:none;border:0;color:#7d7d7d;font-family:inherit;
-    font-size:10.5px;font-weight:800;letter-spacing:1.4px;cursor:pointer;text-transform:uppercase}
+  .hint{display:none;text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:#6a6a6a;
+    margin-top:16px;text-transform:uppercase}
+  .hint.on{display:block}
 
   .vtitle{text-align:center;font-size:12.5px;font-weight:800;letter-spacing:1.6px;color:#9a9a9a;
     text-transform:uppercase;margin-top:44px}
@@ -117,33 +114,6 @@
   .acts button.off{background:#0e0e0e;border-color:rgba(229,50,45,.32);color:#e5483f;margin-top:10px}
   .acts button:active{filter:brightness(1.5)}
   .acts button.on{background:#e5322d;color:#fff;border-color:transparent}
-
-  #s-gen{padding-bottom:0}
-  .gcard{background:#141519;border:1px solid rgba(229,50,45,.3);border-radius:24px;padding:20px 16px 18px;
-    margin-top:14px;text-align:center}
-  .gcard .lbl{font-size:9.5px;font-weight:800;letter-spacing:1.8px;color:#8d8d8d;text-transform:uppercase}
-  .gcard .out{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#fff;
-    letter-spacing:.6px;margin-top:14px;word-break:break-all;min-height:24px;line-height:1.45}
-  .gcard .out.empty{color:#4a4a4a;font-size:14px;letter-spacing:.4px;font-family:Inter,sans-serif}
-  .durrow{display:flex;gap:6px;margin-top:14px}
-  .durrow button{flex:1;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:#121212;
-    color:#b9b9b9;font-family:inherit;font-size:11px;font-weight:800;letter-spacing:.6px;cursor:pointer}
-  .durrow button.on{background:rgba(229,50,45,.18);border-color:rgba(229,50,45,.55);color:#ffb3ae}
-  .gacts{display:flex;gap:8px;margin-top:14px}
-  .gacts button{flex:1;height:50px;border-radius:15px;border:1px solid rgba(255,255,255,.1);background:#121212;
-    color:#fff;font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1.1px;cursor:pointer;transition:.14s}
-  .gacts button:active{transform:scale(.97)}
-  .gacts button.pri{background:linear-gradient(180deg,#e5382f,#cc2823);border-color:transparent;flex:1.2}
-  .gacts button.use{background:rgba(229,50,45,.14);border-color:rgba(229,50,45,.42);color:#ffb3ae}
-  .hlist{flex:1;min-height:0;display:flex;flex-direction:column;margin-top:4px}
-  .hlist .slabel{margin:16px 0 8px}
-  .hrow{display:flex;align-items:center;gap:8px;background:#141414;border-radius:15px;padding:12px 13px;margin-bottom:8px}
-  .hrow .k{flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;color:#d6d6d6;word-break:break-all}
-  .hrow .d{font-size:9.5px;font-weight:800;color:#7d7d7d;letter-spacing:.6px;text-transform:uppercase}
-  .hrow button{background:none;border:0;color:#8d8d8d;font-family:inherit;font-size:10px;font-weight:800;
-    letter-spacing:.6px;cursor:pointer;padding:4px 2px}
-  .hrow button.del{color:#e5483f;font-size:13px}
-  .hempty{text-align:center;color:#5f5f5f;font-size:12px;font-weight:600;padding:22px 0}
 
   .dock{position:relative;z-index:5;flex:0 0 auto;display:flex;justify-content:center;padding:10px 0 20px}
   .dock .in{display:flex;gap:5px;background:#191919;border-radius:32px;padding:6px;width:100%;max-width:372px;
@@ -220,7 +190,7 @@
   <div class="glow"><i></i><i></i></div>
 
   <div class="topbar">
-    <button class="back" id="back" style="display:none" onclick="back()"><svg viewBox="0 0 24 24"><path d="M14.5 5L7.5 12l7 7"/></svg></button>
+    <button class="back" id="back" style="display:none" onclick="home()"><svg viewBox="0 0 24 24"><path d="M14.5 5L7.5 12l7 7"/></svg></button>
     <h2 id="ttl" style="display:none"></h2>
     <button class="gear" id="gear" style="display:none" onclick="sheet(true)"><svg viewBox="0 0 24 24"><path d="M12 8.4a3.6 3.6 0 100 7.2 3.6 3.6 0 000-7.2zm9 3.6a9 9 0 01-.1 1.3l2 1.6-1.9 3.3-2.4-1a9 9 0 01-2.2 1.3l-.4 2.5h-3.8l-.4-2.5a9 9 0 01-2.2-1.3l-2.4 1L4.3 15l2-1.6a9 9 0 010-2.6l-2-1.6 1.9-3.3 2.4 1a9 9 0 012.2-1.3l.4-2.5h3.8l.4 2.5a9 9 0 012.2 1.3l2.4-1 1.9 3.3-2 1.6c.1.4.1.9.1 1.3z"/></svg></button>
   </div>
@@ -239,9 +209,7 @@
       <input class="key" id="key" placeholder="CONTRASEÑA O KEY" maxlength="22" spellcheck="false"
              autocomplete="off" autocapitalize="characters" inputmode="text">
       <button class="go" id="go" onclick="enter()">CONTINUAR</button>
-      <div class="hint" id="hint">Acceso restringido</div>
-      <button class="genlink" onclick="openGen()">Generar key</button>
-      <button class="wdlink" onclick="location.href='windir.html'">Abrir generador Windir</button>
+      <div class="hint" id="hint"></div>
     </section>
 
     <section class="scr" id="s-ver">
@@ -277,30 +245,6 @@
         <button class="off" onclick="off()">DESACTIVAR</button>
       </div>
     </section>
-
-    <section class="scr" id="s-gen">
-      <div class="gcard">
-        <div class="lbl">Key XITFORGE</div>
-        <div class="out empty" id="gout">Sin generar</div>
-        <div class="durrow" id="gdur">
-          <button data-dd="1">1d</button>
-          <button data-dd="7">7d</button>
-          <button class="on" data-dd="30">30d</button>
-          <button data-dd="90">90d</button>
-          <button data-dd="0">Perm</button>
-        </div>
-        <div class="gacts">
-          <button class="pri" onclick="makeKey()">GENERAR</button>
-          <button onclick="copyGen()">COPIAR</button>
-          <button class="use" onclick="useGen()">USAR</button>
-        </div>
-      </div>
-      <div class="hlist">
-        <div class="slabel" id="hlbl">Emitidas · 0</div>
-        <div class="rows" id="hrows"></div>
-      </div>
-      <div class="acts"><button class="off" onclick="clearKeys()">BORRAR HISTORIAL</button></div>
-    </section>
   </main>
 
   <div class="dock" id="dock" style="display:none">
@@ -330,7 +274,11 @@
         <div class="it"><span class="k">ACTIVADA</span><span class="v" id="ustart">—</span></div>
         <div class="it"><span class="k">VENCE</span><span class="v" id="uend" style="color:#ffb3ae">—</span></div>
         <div class="it"><span class="k">ESTADO</span><span class="v g" id="ust">ACTIVA</span></div>
-        <div class="it btn" onclick="sheet(false);openGen()"><span class="k">GENERADOR DE KEYS</span><span class="v">›</span></div>
+      </div>
+
+      <div class="grp">
+        <div class="t">GENERADOR</div>
+        <div class="it btn" onclick="irGenerador()"><span class="k">ABRIR GENERADOR</span><span class="v">›</span></div>
       </div>
 
       <div class="grp">
@@ -403,15 +351,6 @@ async function xfSign(payload){
   const s=await crypto.subtle.sign('HMAC',k,XF_ENC.encode(payload));
   return xfB32(new Uint8Array(s).slice(0,4)).slice(0,6);
 }
-async function xfMake(dias){
-  const b=new Uint8Array(6);
-  b[0]=1;
-  b[1]=(dias>>8)&255;
-  b[2]=dias&255;
-  crypto.getRandomValues(b.subarray(3));
-  const p=xfB32(b);
-  return 'XITF-'+p+'-'+await xfSign(p);
-}
 async function xfCheck(key){
   const parts=String(key).toUpperCase().split('-');
   if(parts.length!==3||parts[0]!=='XITF')return null;
@@ -427,25 +366,12 @@ async function xfCheck(key){
 const MASTER='XITFORGE';
 const MAX_TRIES=5, LOCK_MS=30000;
 
-let cur=0,sel=null,logged=false,genKey_=null,genDias=30,lockT=null;
+let cur=0,sel=null,logged=false,lockT=null;
 
 const norm=v=>String(v).toUpperCase().replace(/[^A-Z0-9]/g,'');
 const hyph=v=>norm(v).replace(/(.{4})/g,'$1-').replace(/-$/,'');
-const KEYS=()=>{try{const a=JSON.parse(localStorage.getItem('xf_keys')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}};
-const saveKeys=a=>localStorage.setItem('xf_keys',JSON.stringify(a.slice(0,200)));
 
 if(!localStorage.getItem('xf_start'))localStorage.setItem('xf_start',Date.now());
-
-(function importar(){
-  let ext=[];
-  try{ext=JSON.parse(localStorage.getItem('xf_issued')||'[]')}catch(e){}
-  if(!Array.isArray(ext)||!ext.length)return;
-  const ya=new Set(KEYS().map(k=>k.k));
-  const nuevos=ext.filter(x=>x&&x.k&&!ya.has(x.k)).map(x=>({k:x.k,d:Number(x.d)||0,t:Number(x.t)||Date.now()}));
-  if(!nuevos.length)return;
-  saveKeys([...nuevos,...KEYS()]);
-  localStorage.removeItem('xf_issued');
-})();
 
 $('key').addEventListener('input',e=>{
   const r=norm(e.target.value).slice(0,20);
@@ -458,6 +384,12 @@ $('key').addEventListener('input',e=>{
 });
 $('key').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();enter()}});
 
+function hint(txt){
+  const h=$('hint');
+  if(txt){h.textContent=txt;h.classList.add('on')}
+  else{h.textContent='';h.classList.remove('on')}
+}
+
 const isLocked=()=>Number(localStorage.getItem('xf_lock')||0)>Date.now();
 
 function lockTick(){
@@ -466,11 +398,11 @@ function lockTick(){
     const left=Number(localStorage.getItem('xf_lock')||0)-Date.now();
     if(left>0){
       $('go').disabled=true;
-      $('hint').textContent='Bloqueado · '+Math.ceil(left/1000)+'s';
+      hint('Bloqueado · '+Math.ceil(left/1000)+'s');
     }else{
       clearInterval(lockT);
       $('go').disabled=false;
-      $('hint').textContent='Acceso restringido';
+      hint('');
     }
   };
   run();
@@ -490,7 +422,7 @@ function fail(msg){
     lockTick();
   }else{
     localStorage.setItem('xf_tries',t);
-    $('hint').textContent=msg+' · '+(MAX_TRIES-t)+' intento'+((MAX_TRIES-t)===1?'':'s');
+    hint(msg+' · '+(MAX_TRIES-t)+' intento'+((MAX_TRIES-t)===1?'':'s'));
     toast(msg);
   }
 }
@@ -514,72 +446,11 @@ function abrir(key,dias){
   logged=true;
   $('key').classList.remove('bad');
   $('key').classList.add('good');
-  $('hint').textContent='Acceso restringido';
-  if(KEYS().some(k=>k.k===key))saveKeys(KEYS().map(k=>k.k===key?{...k,used:Date.now()}:k));
+  hint('');
   show('ver');
 }
 
-async function makeKey(){
-  const k=await xfMake(genDias);
-  genKey_=k;
-  saveKeys([{k,d:genDias,t:Date.now()},...KEYS()]);
-  try{
-    const ext=JSON.parse(localStorage.getItem('xf_issued')||'[]');
-    localStorage.setItem('xf_issued',JSON.stringify([{k,d:genDias,t:Date.now()},...(Array.isArray(ext)?ext:[])].slice(0,200)));
-  }catch(e){}
-  $('gout').textContent=k;
-  $('gout').classList.remove('empty');
-  renderHist();
-  toast('Key generada · '+(genDias?genDias+'d':'permanente'));
-}
-
-function openGen(){
-  if(!genKey_)makeKey();
-  show('gen');
-  renderHist();
-}
-
-function copyGen(){
-  if(!genKey_){makeKey();return}
-  navigator.clipboard?.writeText(genKey_);
-  toast('Key copiada');
-}
-
-async function useGen(){
-  if(!genKey_)await makeKey();
-  $('key').value=genKey_;
-  show('login');
-  setTimeout(enter,90);
-}
-
-function renderHist(){
-  const a=KEYS();
-  $('hlbl').textContent='Emitidas · '+a.length;
-  $('hrows').innerHTML = a.length
-    ? a.map((k,i)=>`<div class="hrow"><span class="k">${k.k}</span>
-        <span class="d">${k.d?k.d+'d':'perm'}</span>
-        <button onclick="cpKey('${k.k}')">COPIAR</button>
-        <button class="del" onclick="delKey(${i})">✕</button></div>`).join('')
-    : '<div class="hempty">Sin keys emitidas</div>';
-}
-
-function cpKey(k){navigator.clipboard?.writeText(k);toast('Key copiada')}
-
-function delKey(i){
-  const a=KEYS();
-  a.splice(i,1);
-  saveKeys(a);
-  renderHist();
-  toast('Key eliminada');
-}
-
-function clearKeys(){
-  if(!KEYS().length){toast('No hay keys');return}
-  saveKeys([]);
-  renderHist();
-  toast('Historial borrado');
-}
-
+/* ---------- navegación ---------- */
 function draw(){
   $('rows').innerHTML=DATA[cur].map((r,k)=>`<button class="row" data-k="${k}" onclick="pick(${k},this)">
     <span class="dot"></span><span class="tx"><b>${r[0]}</b><span>${r[1]}</span></span>
@@ -597,23 +468,17 @@ function show(id){
   document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
   $('s-'+id).classList.add('on');
 
-  const sub = id==='cheat'||id==='gen';
+  const sub = id==='cheat';
   $('back').style.display = sub?'grid':'none';
   $('ttl').style.display  = sub?'block':'none';
   $('gear').style.display = id==='ver'?'block':'none';
   $('lang').style.display = id==='login'?'flex':'none';
-  $('dock').style.display = (logged && id!=='login' && id!=='gen')?'flex':'none';
+  $('dock').style.display = (logged && id!=='login')?'flex':'none';
 
-  if(id==='gen')$('ttl').textContent='Generador';
   if(id==='login'||id==='ver')$('ttl').textContent='';
 
-  markDock(id==='login'||id==='gen'?null:'dc');
+  markDock(id==='login'?null:'dc');
   if(id==='ver'&&logged)paint();
-}
-
-function back(){
-  if($('s-gen').classList.contains('on')){ logged?show('ver'):show('login'); return }
-  home();
 }
 
 function home(){show('ver');$('ttl').textContent=''}
@@ -633,11 +498,7 @@ function off(){
 $('act').onclick=()=>{if(sel===null){toast('Selecciona una opción');return}
   toast(DATA[cur][sel][0]+' activado')};
 
-[...$('gdur').children].forEach(b=>b.onclick=()=>{
-  [...$('gdur').children].forEach(x=>x.classList.remove('on'));
-  b.classList.add('on');
-  genDias=Number(b.dataset.dd);
-});
+function irGenerador(){location.href='windir.html'}
 
 function menu(){$('menu').classList.toggle('on')}
 function setLang(v,el){
@@ -691,14 +552,12 @@ function logout(){
   localStorage.removeItem('xf_start');
   localStorage.removeItem('xf_key');
   localStorage.removeItem('xf_days');
-  logged=false;genKey_=null;
+  logged=false;
   sheet(false);
   show('login');
   $('key').value='';
   $('key').classList.remove('good','bad');
-  $('gout').textContent='Sin generar';
-  $('gout').classList.add('empty');
-  $('hint').textContent='Acceso restringido';
+  hint('');
   lockTick();
   toast('Sesión cerrada');
 }
