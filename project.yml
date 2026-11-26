@@ -15,7 +15,6 @@ targets:
       - path: XITFORGE/Sources
       - path: XITFORGE/web
         type: folder
-      - path: XITFORGE/Assets.xcassets
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.xitforge.panel
@@ -24,7 +23,6 @@ targets:
         MARKETING_VERSION: "4.3.0"
         CURRENT_PROJECT_VERSION: "1"
         TARGETED_DEVICE_FAMILY: "1"
-        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         CODE_SIGNING_ALLOWED: NO
         ENABLE_BITCODE: NO
 schemes:
