@@ -1,0 +1,36 @@
+name: XITFORGE
+options:
+  bundleIdPrefix: com.xitforge
+  deploymentTarget:
+    iOS: "15.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+targets:
+  XITFORGE:
+    type: application
+    platform: iOS
+    sources:
+      - path: XITFORGE/Sources
+      - path: XITFORGE/web
+        type: folder
+      - path: XITFORGE/Assets.xcassets
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.xitforge.panel
+        PRODUCT_NAME: XITFORGE
+        INFOPLIST_FILE: XITFORGE/Info.plist
+        MARKETING_VERSION: "4.3.0"
+        CURRENT_PROJECT_VERSION: "1"
+        TARGETED_DEVICE_FAMILY: "1"
+        ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
+        CODE_SIGNING_ALLOWED: NO
+        ENABLE_BITCODE: NO
+schemes:
+  XITFORGE:
+    build:
+      targets:
+        XITFORGE: all
+    run:
+      config: Release
