@@ -1,0 +1,713 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#000000">
+<title>XITFORGE</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;700&display=swap');
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+  html,body{height:100%}
+  body{background:#000;font-family:Inter,-apple-system,"SF Pro Display",sans-serif;color:#fff;
+    display:flex;justify-content:center;overflow:hidden}
+  :root{--rd:#e5322d;--rd2:#c9251f;--row:#141414}
+
+  .app{position:relative;width:100%;max-width:436px;height:100%;background:#000;
+    display:flex;flex-direction:column;overflow:hidden;
+    padding-top:env(safe-area-inset-top);padding-bottom:env(safe-area-inset-bottom)}
+  .glow{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+  .glow i{position:absolute;border-radius:50%;background:radial-gradient(circle,rgba(190,20,15,.42),rgba(120,10,8,.14) 55%,transparent 72%)}
+  .glow i:nth-child(1){width:640px;height:640px;top:-250px;left:-200px}
+  .glow i:nth-child(2){width:720px;height:720px;bottom:-340px;left:50%;transform:translateX(-50%)}
+
+  .topbar{position:relative;z-index:5;height:64px;flex:0 0 64px;display:flex;align-items:center;justify-content:center;padding:0 18px}
+  .topbar .gear{position:absolute;right:18px;width:34px;height:34px;display:grid;place-items:center;
+    background:none;border:0;color:#e7e7e7;cursor:pointer}
+  .topbar .gear svg{width:26px;height:26px;fill:currentColor}
+  .topbar .back{position:absolute;left:18px;width:40px;height:40px;border-radius:50%;background:#1a1a1a;
+    border:0;display:grid;place-items:center;color:#fff;cursor:pointer}
+  .topbar .back svg{width:19px;height:19px;fill:none;stroke:currentColor;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+  .topbar h2{font-size:16px;font-weight:800;letter-spacing:.4px;color:var(--rd);text-transform:uppercase}
+
+  .lang{position:absolute;right:18px;top:16px;z-index:7;display:flex;align-items:center;gap:7px;height:34px;
+    padding:0 12px;border-radius:20px;background:#161616;border:1px solid rgba(255,255,255,.1);
+    color:#fff;font-family:inherit;font-size:12.5px;font-weight:800;letter-spacing:.8px;cursor:pointer}
+  .lang svg{width:14px;height:14px;fill:none;stroke:#e5483f;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+  .lang .cv{color:#8b8b8b;font-size:9px}
+  .menu{position:absolute;right:18px;top:56px;z-index:8;background:#191919;border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;padding:6px;width:150px;display:none;box-shadow:0 18px 40px rgba(0,0,0,.7)}
+  .menu.on{display:block;animation:fd .16s}
+  .menu button{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:0;background:none;
+    color:#fff;font-family:inherit;font-size:14px;font-weight:600;cursor:pointer;border-radius:11px;text-align:left}
+  .menu button:active{background:#242424}
+  .menu .b{width:26px;height:26px;flex:0 0 26px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:800}
+  .menu .b.es{background:#e5322d}.menu .b.en{background:#2f62d6}.menu .b.pt{background:#2fa84f}
+
+  .stage{position:relative;z-index:4;flex:1;min-height:0;overflow:hidden}
+  .scr{display:none;height:100%;flex-direction:column;padding:0 20px}
+  .scr.on{display:flex;animation:in .28s ease}
+  @keyframes in{from{opacity:0}to{opacity:1}}
+
+  .logo{font-size:37px;font-weight:900;letter-spacing:-1.2px;text-align:center;margin-top:56px}
+  .uline{width:58px;height:3px;background:var(--rd);border-radius:3px;margin:14px auto 0}
+  .key{width:100%;height:66px;margin-top:60px;background:#0d0d0d;border:1px solid rgba(255,255,255,.13);
+    border-radius:18px;color:#fff;text-align:center;font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;
+    letter-spacing:1.4px;outline:none;transition:border-color .15s}
+  .key::placeholder{color:#4a4a4a;letter-spacing:1.2px;font-size:12.5px;font-family:Inter,sans-serif;font-weight:600}
+  .key:focus{border-color:rgba(229,50,45,.6)}
+  .key.bad{border-color:rgba(229,50,45,.95);animation:sh .34s}
+  .key.good{border-color:rgba(34,197,94,.8)}
+  @keyframes sh{0%,100%{transform:none}18%{transform:translateX(-8px)}36%{transform:translateX(8px)}
+    54%{transform:translateX(-5px)}72%{transform:translateX(5px)}90%{transform:translateX(-2px)}}
+  .go{width:100%;height:62px;margin-top:16px;border:0;border-radius:18px;cursor:pointer;
+    background:linear-gradient(180deg,#e5382f,#cc2823);color:#fff;font-family:inherit;font-size:16px;
+    font-weight:800;letter-spacing:1.6px;transition:.15s}
+  .go:active{filter:brightness(.92);transform:scale(.99)}
+  .go:disabled{filter:brightness(.5);cursor:default;transform:none}
+  .hint{text-align:center;font-size:11px;font-weight:700;letter-spacing:1px;color:#6a6a6a;
+    margin-top:16px;text-transform:uppercase;min-height:15px}
+  .genlink{display:block;margin:18px auto 0;background:none;border:0;color:#e5483f;font-family:inherit;
+    font-size:11.5px;font-weight:800;letter-spacing:1.6px;cursor:pointer;text-transform:uppercase}
+  .wdlink{display:block;margin:12px auto 0;background:none;border:0;color:#7d7d7d;font-family:inherit;
+    font-size:10.5px;font-weight:800;letter-spacing:1.4px;cursor:pointer;text-transform:uppercase}
+
+  .vtitle{text-align:center;font-size:12.5px;font-weight:800;letter-spacing:1.6px;color:#9a9a9a;
+    text-transform:uppercase;margin-top:44px}
+  .vcards{display:flex;gap:12px;margin-top:26px}
+  .vc{flex:1;background:#191919;border:0;border-radius:26px;padding:24px 10px 26px;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;gap:14px;color:#fff;font-family:inherit;transition:.15s}
+  .vc:active{transform:scale(.97);background:#222}
+  .vc .ic{width:56px;height:56px;border-radius:19px;display:grid;place-items:center;
+    background:linear-gradient(160deg,#262626,#1b1b1b);border:1px solid rgba(255,255,255,.1);color:#fff}
+  .vc .ic svg{width:32px;height:32px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+  .vc.max .ic{color:#ff5a52;border-color:rgba(229,50,45,.4);background:linear-gradient(160deg,#2b1717,#1c1111)}
+  .vc .nm{font-size:12.5px;font-weight:800;letter-spacing:.7px;text-transform:uppercase;text-align:center;line-height:1.5}
+
+  .tabs{display:flex;gap:9px;margin-top:2px}
+  .tabs button{flex:1;height:52px;border-radius:18px;border:1px solid rgba(255,255,255,.1);background:#121212;
+    color:#cfcfcf;font-family:inherit;font-size:11.5px;font-weight:800;letter-spacing:.9px;cursor:pointer;transition:.15s}
+  .tabs button.on{background:linear-gradient(180deg,#e5382f,#cc2823);color:#fff;border-color:transparent;
+    box-shadow:0 6px 18px rgba(200,30,25,.35)}
+  .slabel{font-size:11px;font-weight:800;letter-spacing:1.3px;color:#8a8a8a;text-transform:uppercase;margin:20px 0 12px}
+  .rows{flex:1;min-height:0;overflow-y:auto;display:flex;flex-direction:column;gap:11px;padding-bottom:10px;scrollbar-width:none}
+  .rows::-webkit-scrollbar{display:none}
+  .row{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:17px 16px;border-radius:22px;
+    background:var(--row);border:1px solid transparent;color:#fff;font-family:inherit;cursor:pointer;transition:.14s}
+  .row:active{background:#1b1b1b}
+  .row.on{border-color:rgba(229,50,45,.55);background:#1b1212}
+  .row .dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex:0 0 7px;margin-top:2px;
+    box-shadow:0 0 8px rgba(34,197,94,.8)}
+  .row .tx{flex:1;min-width:0}
+  .row .tx b{display:block;font-size:15.5px;font-weight:800;letter-spacing:-.2px;text-transform:uppercase;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .tx span{display:block;font-size:12.5px;font-weight:500;color:#8d8d8d;margin-top:5px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .rad{width:25px;height:25px;flex:0 0 25px;border-radius:50%;border:2px solid rgba(255,255,255,.18);
+    display:grid;place-items:center;transition:.15s}
+  .rad i{width:13px;height:13px;border-radius:50%;background:var(--rd);transform:scale(0);transition:.15s}
+  .row.on .rad{border-color:var(--rd)}
+  .row.on .rad i{transform:scale(1)}
+
+  .acts{flex:0 0 auto;padding:8px 0 14px}
+  .acts button{width:100%;height:58px;border-radius:19px;border:1px solid rgba(255,255,255,.09);background:#121212;
+    color:#8f8f8f;font-family:inherit;font-size:15px;font-weight:800;letter-spacing:1.4px;cursor:pointer;transition:.15s}
+  .acts button.off{background:#0e0e0e;border-color:rgba(229,50,45,.32);color:#e5483f;margin-top:10px}
+  .acts button:active{filter:brightness(1.5)}
+  .acts button.on{background:#e5322d;color:#fff;border-color:transparent}
+
+  #s-gen{padding-bottom:0}
+  .gcard{background:#141519;border:1px solid rgba(229,50,45,.3);border-radius:24px;padding:20px 16px 18px;
+    margin-top:14px;text-align:center}
+  .gcard .lbl{font-size:9.5px;font-weight:800;letter-spacing:1.8px;color:#8d8d8d;text-transform:uppercase}
+  .gcard .out{font-family:'JetBrains Mono',monospace;font-size:15px;font-weight:700;color:#fff;
+    letter-spacing:.6px;margin-top:14px;word-break:break-all;min-height:24px;line-height:1.45}
+  .gcard .out.empty{color:#4a4a4a;font-size:14px;letter-spacing:.4px;font-family:Inter,sans-serif}
+  .durrow{display:flex;gap:6px;margin-top:14px}
+  .durrow button{flex:1;height:38px;border-radius:11px;border:1px solid rgba(255,255,255,.1);background:#121212;
+    color:#b9b9b9;font-family:inherit;font-size:11px;font-weight:800;letter-spacing:.6px;cursor:pointer}
+  .durrow button.on{background:rgba(229,50,45,.18);border-color:rgba(229,50,45,.55);color:#ffb3ae}
+  .gacts{display:flex;gap:8px;margin-top:14px}
+  .gacts button{flex:1;height:50px;border-radius:15px;border:1px solid rgba(255,255,255,.1);background:#121212;
+    color:#fff;font-family:inherit;font-size:11px;font-weight:800;letter-spacing:1.1px;cursor:pointer;transition:.14s}
+  .gacts button:active{transform:scale(.97)}
+  .gacts button.pri{background:linear-gradient(180deg,#e5382f,#cc2823);border-color:transparent;flex:1.2}
+  .gacts button.use{background:rgba(229,50,45,.14);border-color:rgba(229,50,45,.42);color:#ffb3ae}
+  .hlist{flex:1;min-height:0;display:flex;flex-direction:column;margin-top:4px}
+  .hlist .slabel{margin:16px 0 8px}
+  .hrow{display:flex;align-items:center;gap:8px;background:#141414;border-radius:15px;padding:12px 13px;margin-bottom:8px}
+  .hrow .k{flex:1;font-family:'JetBrains Mono',monospace;font-size:11px;color:#d6d6d6;word-break:break-all}
+  .hrow .d{font-size:9.5px;font-weight:800;color:#7d7d7d;letter-spacing:.6px;text-transform:uppercase}
+  .hrow button{background:none;border:0;color:#8d8d8d;font-family:inherit;font-size:10px;font-weight:800;
+    letter-spacing:.6px;cursor:pointer;padding:4px 2px}
+  .hrow button.del{color:#e5483f;font-size:13px}
+  .hempty{text-align:center;color:#5f5f5f;font-size:12px;font-weight:600;padding:22px 0}
+
+  .dock{position:relative;z-index:5;flex:0 0 auto;display:flex;justify-content:center;padding:10px 0 20px}
+  .dock .in{display:flex;gap:5px;background:#191919;border-radius:32px;padding:6px;width:100%;max-width:372px;
+    box-shadow:0 14px 34px rgba(0,0,0,.6)}
+  .dock button{flex:1;height:56px;border-radius:26px;border:0;background:none;cursor:pointer;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;
+    color:#dcdcdc;font-family:inherit;font-size:9.5px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;transition:.15s}
+  .dock button svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .dock button.on{background:#2b2b2b;color:#fff}
+  .dock button.on svg{stroke:var(--rd)}
+
+  .mask{position:absolute;inset:0;z-index:12;display:none;align-items:flex-end;background:rgba(0,0,0,.58)}
+  .mask.on{display:flex;animation:fd .2s}
+  @keyframes fd{from{opacity:0}to{opacity:1}}
+  .sheet{width:100%;background:#141519;border-radius:26px 26px 0 0;padding:14px 16px 22px;
+    animation:up .28s cubic-bezier(.2,.9,.3,1);max-height:92%;overflow-y:auto;scrollbar-width:none}
+  .sheet::-webkit-scrollbar{display:none}
+  @keyframes up{from{transform:translateY(40px);opacity:.4}to{transform:none;opacity:1}}
+  .sheet .sh{display:flex;align-items:center;justify-content:center;position:relative;padding-bottom:14px}
+  .sheet .sh span{font-size:15px;font-weight:700;color:#d2d2d2}
+  .sheet .sh button{position:absolute;right:2px;background:none;border:0;color:#c9c9c9;font-size:23px;line-height:1;cursor:pointer}
+
+  .lic{border-radius:20px;padding:16px;border:1px solid rgba(229,50,45,.3);
+    background:linear-gradient(150deg,rgba(229,50,45,.22),rgba(229,50,45,.05) 55%,transparent)}
+  .lic .tp{display:flex;justify-content:space-between;font-size:9.5px;font-weight:800;letter-spacing:1.6px;color:#ffb3ae}
+  .lic .nm{font-size:17px;font-weight:800;margin-top:12px}
+  .lic .id{font-family:'JetBrains Mono',monospace;font-size:10px;color:#a8a8a8;margin-top:3px}
+  .lic .bar{height:7px;border-radius:6px;background:rgba(0,0,0,.45);margin-top:14px;overflow:hidden}
+  .lic .bar i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#ff5a52,#c9251f);transition:width .6s}
+  .lic .ft{display:flex;justify-content:space-between;font-size:10.5px;font-weight:700;color:#bdbdbd;margin-top:7px}
+
+  .grp{background:#202127;border-radius:20px;padding:6px 14px;margin-top:12px}
+  .grp .t{font-size:10.5px;font-weight:800;letter-spacing:1.4px;color:#7d7d7d;padding:12px 0 4px}
+  .it{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 0;
+    border-top:1px solid rgba(255,255,255,.06);font-family:inherit;color:#fff;background:none;border-left:0;border-right:0;border-bottom:0;width:100%;text-align:left}
+  .grp .t+.it{border-top:0}
+  .it .k{font-size:10.5px;font-weight:800;letter-spacing:1px;color:#8d8d8d}
+  .it .v{font-size:12.5px;font-weight:700;text-align:right}
+  .it .v.mono{font-family:'JetBrains Mono',monospace;font-size:10px;color:#ffb3ae;word-break:break-all}
+  .it .v.g{color:#4ade80}
+  .cp{background:rgba(229,50,45,.16);border:1px solid rgba(229,50,45,.4);color:#ffb3ae;border-radius:7px;
+    font-size:9px;font-weight:800;letter-spacing:.5px;padding:4px 7px;margin-left:6px;cursor:pointer;font-family:inherit}
+  .it.btn{cursor:pointer}
+  .it.btn:active{opacity:.7}
+  .it .l{display:flex;align-items:center;gap:10px}
+  .it .l svg{width:17px;height:17px;fill:none;stroke:#e5483f;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+  .it .l b{font-size:14px;font-weight:700}
+  .it .l span{display:block;font-size:11px;font-weight:500;color:#8d8d8d;margin-top:2px}
+  .sw{width:50px;height:29px;flex:0 0 50px;border-radius:18px;background:#5b5b60;position:relative;
+    transition:.2s;cursor:pointer;border:0}
+  .sw::after{content:"";position:absolute;top:3px;left:3px;width:23px;height:23px;border-radius:50%;background:#fff;transition:.2s}
+  .sw.on{background:#e5322d}
+  .sw.on::after{left:24px}
+  .dng{margin-top:12px;width:100%;height:54px;border-radius:17px;border:1px solid rgba(229,50,45,.35);
+    background:#0e0e0e;color:#e5483f;font-family:inherit;font-size:14.5px;font-weight:800;letter-spacing:1.2px;cursor:pointer}
+
+  .toast{position:absolute;left:20px;right:20px;bottom:100px;z-index:15;background:#1d1d1f;border:1px solid rgba(255,255,255,.1);
+    border-radius:16px;padding:14px 16px;font-size:13.5px;font-weight:600;text-align:center;
+    opacity:0;transform:translateY(10px);transition:.25s;pointer-events:none}
+  .toast.on{opacity:1;transform:none}
+
+  @media (max-height:740px){
+    .logo{margin-top:34px}
+    .key{margin-top:40px}
+    .vtitle{margin-top:28px}
+    .vcards{margin-top:18px}
+    .vc{padding:18px 10px 20px}
+    .vc .ic{width:48px;height:48px}
+  }
+</style>
+</head>
+<body>
+<div class="app">
+  <div class="glow"><i></i><i></i></div>
+
+  <div class="topbar">
+    <button class="back" id="back" style="display:none" onclick="back()"><svg viewBox="0 0 24 24"><path d="M14.5 5L7.5 12l7 7"/></svg></button>
+    <h2 id="ttl" style="display:none"></h2>
+    <button class="gear" id="gear" style="display:none" onclick="sheet(true)"><svg viewBox="0 0 24 24"><path d="M12 8.4a3.6 3.6 0 100 7.2 3.6 3.6 0 000-7.2zm9 3.6a9 9 0 01-.1 1.3l2 1.6-1.9 3.3-2.4-1a9 9 0 01-2.2 1.3l-.4 2.5h-3.8l-.4-2.5a9 9 0 01-2.2-1.3l-2.4 1L4.3 15l2-1.6a9 9 0 010-2.6l-2-1.6 1.9-3.3 2.4 1a9 9 0 012.2-1.3l.4-2.5h3.8l.4 2.5a9 9 0 012.2 1.3l2.4-1 1.9 3.3-2 1.6c.1.4.1.9.1 1.3z"/></svg></button>
+  </div>
+
+  <button class="lang" id="lang" onclick="menu()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.7 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.7-3.9-9S9.4 5.6 12 3z"/></svg><span id="langT">ES</span><span class="cv">▼</span></button>
+  <div class="menu" id="menu">
+    <button onclick="setLang('ES',this)"><span class="b es">ES</span>Español</button>
+    <button onclick="setLang('EN',this)"><span class="b en">EN</span>English</button>
+    <button onclick="setLang('PT',this)"><span class="b pt">PT</span>Português</button>
+  </div>
+
+  <main class="stage">
+    <section class="scr on" id="s-login">
+      <div class="logo">XITFORGE</div>
+      <div class="uline"></div>
+      <input class="key" id="key" placeholder="CONTRASEÑA O KEY" maxlength="22" spellcheck="false"
+             autocomplete="off" autocapitalize="characters" inputmode="text">
+      <button class="go" id="go" onclick="enter()">CONTINUAR</button>
+      <div class="hint" id="hint">Acceso restringido</div>
+      <button class="genlink" onclick="openGen()">Generar key</button>
+      <button class="wdlink" onclick="location.href='windir.html'">Abrir generador Windir</button>
+    </section>
+
+    <section class="scr" id="s-ver">
+      <div class="vtitle">Elige tu versión</div>
+      <div class="vcards">
+        <button class="vc" onclick="openCheats('Free Fire Normal')">
+          <span class="ic"><svg viewBox="0 0 24 24">
+            <path d="M7.2 7.5h9.6c2.9 0 4.7 2.3 4.7 5.1v2.6c0 1.9-1.5 3.2-3.2 3.2-1 0-1.7-.5-2.4-1.3l-.9-1.1H9l-.9 1.1c-.7.8-1.4 1.3-2.4 1.3-1.7 0-3.2-1.3-3.2-3.2v-2.6c0-2.8 1.8-5.1 4.7-5.1z"/>
+            <path d="M7.6 10.4v2.6M6.3 11.7h2.6"/><circle cx="15.7" cy="11.2" r=".95"/><circle cx="17.6" cy="13.1" r=".95"/>
+          </svg></span>
+          <span class="nm">Free Fire Normal</span>
+        </button>
+        <button class="vc max" onclick="openCheats('Free Fire MAX')">
+          <span class="ic"><svg viewBox="0 0 24 24">
+            <path d="M7.2 7.5h9.6c2.9 0 4.7 2.3 4.7 5.1v2.6c0 1.9-1.5 3.2-3.2 3.2-1 0-1.7-.5-2.4-1.3l-.9-1.1H9l-.9 1.1c-.7.8-1.4 1.3-2.4 1.3-1.7 0-3.2-1.3-3.2-3.2v-2.6c0-2.8 1.8-5.1 4.7-5.1z"/>
+            <path d="M7.6 10.4v2.6M6.3 11.7h2.6"/><path d="M15.4 13.4l2.6-3.6-1.9.1 1-2.1"/>
+          </svg></span>
+          <span class="nm">Free Fire MAX</span>
+        </button>
+      </div>
+    </section>
+
+    <section class="scr" id="s-cheat">
+      <div class="tabs" id="tabs">
+        <button class="on" onclick="tab(0,this)">AIMBOTS</button>
+        <button onclick="tab(1,this)">HOLOGRAMAS</button>
+        <button onclick="tab(2,this)">EXTRAS</button>
+      </div>
+      <div class="slabel">Selecciona una opción</div>
+      <div class="rows" id="rows"></div>
+      <div class="acts">
+        <button id="act">ACTIVAR</button>
+        <button class="off" onclick="off()">DESACTIVAR</button>
+      </div>
+    </section>
+
+    <section class="scr" id="s-gen">
+      <div class="gcard">
+        <div class="lbl">Key XITFORGE</div>
+        <div class="out empty" id="gout">Sin generar</div>
+        <div class="durrow" id="gdur">
+          <button data-dd="1">1d</button>
+          <button data-dd="7">7d</button>
+          <button class="on" data-dd="30">30d</button>
+          <button data-dd="90">90d</button>
+          <button data-dd="0">Perm</button>
+        </div>
+        <div class="gacts">
+          <button class="pri" onclick="makeKey()">GENERAR</button>
+          <button onclick="copyGen()">COPIAR</button>
+          <button class="use" onclick="useGen()">USAR</button>
+        </div>
+      </div>
+      <div class="hlist">
+        <div class="slabel" id="hlbl">Emitidas · 0</div>
+        <div class="rows" id="hrows"></div>
+      </div>
+      <div class="acts"><button class="off" onclick="clearKeys()">BORRAR HISTORIAL</button></div>
+    </section>
+  </main>
+
+  <div class="dock" id="dock" style="display:none">
+    <div class="in">
+      <button id="dc" class="on" onclick="control()"><svg viewBox="0 0 24 24"><path d="M7.4 8h9.2c2.7 0 4.4 2.1 4.4 4.8v2.4c0 1.7-1.4 2.9-3 2.9-.9 0-1.5-.4-2.2-1.2l-.9-1H9.1l-.9 1c-.7.8-1.3 1.2-2.2 1.2-1.6 0-3-1.2-3-2.9v-2.4C3 10.1 4.7 8 7.4 8z"/><path d="M7.9 10.7v2.4M6.7 11.9h2.4"/><circle cx="15.6" cy="11.4" r=".9"/><circle cx="17.4" cy="13.2" r=".9"/></svg>Control</button>
+      <button id="dt" onclick="tunel()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.9 5.7 3.9 9s-1.3 6.4-3.9 9c-2.6-2.6-3.9-5.7-3.9-9S9.4 5.6 12 3z"/></svg>Túnel</button>
+      <button id="dg" onclick="conf()"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.2"/><path d="M19.5 14.5l1.7 1.4-1.7 2.9-2.1-.9a7.6 7.6 0 01-1.9 1.1l-.3 2.2h-3.4l-.3-2.2a7.6 7.6 0 01-1.9-1.1l-2.1.9-1.7-2.9 1.7-1.4a7.6 7.6 0 010-2.2L4.8 10.9 6.5 8l2.1.9a7.6 7.6 0 011.9-1.1l.3-2.2h3.4l.3 2.2a7.6 7.6 0 011.9 1.1l2.1-.9 1.7 2.9-1.7 1.4c.1.4.1.8 0 1.2z"/></svg>Configuración</button>
+    </div>
+  </div>
+
+  <div class="mask" id="mask">
+    <div class="sheet">
+      <div class="sh"><span>Configuración</span><button onclick="sheet(false)">✕</button></div>
+
+      <div class="lic">
+        <div class="tp"><span>LICENCIA VIP</span><span id="utier">XITFORGE</span></div>
+        <div class="nm">Windir Guest</div>
+        <div class="id">HWID 8842-A1F0-77C3</div>
+        <div class="bar"><i id="ubar"></i></div>
+        <div class="ft"><span id="udays">—</span><span id="upct">—</span></div>
+      </div>
+
+      <div class="grp">
+        <div class="t">CUENTA</div>
+        <div class="it"><span class="k">KEY</span><span class="v mono"><span id="ukey">—</span><button class="cp" onclick="copyKey()">COPIAR</button></span></div>
+        <div class="it"><span class="k">DURACIÓN</span><span class="v" id="uplan">—</span></div>
+        <div class="it"><span class="k">ACTIVADA</span><span class="v" id="ustart">—</span></div>
+        <div class="it"><span class="k">VENCE</span><span class="v" id="uend" style="color:#ffb3ae">—</span></div>
+        <div class="it"><span class="k">ESTADO</span><span class="v g" id="ust">ACTIVA</span></div>
+        <div class="it btn" onclick="sheet(false);openGen()"><span class="k">GENERADOR DE KEYS</span><span class="v">›</span></div>
+      </div>
+
+      <div class="grp">
+        <div class="t">DISPOSITIVO</div>
+        <div class="it"><span class="k">MODELO</span><span class="v">iPhone 14 Pro</span></div>
+        <div class="it"><span class="k">SISTEMA</span><span class="v">iOS 17.4</span></div>
+        <div class="it"><span class="k">SERVIDOR</span><span class="v">EU-WEST · 24 ms</span></div>
+        <div class="it"><span class="k">HWID</span><span class="v mono">8842-A1F0-77C3<button class="cp" onclick="toast('HWID copiado')">COPIAR</button></span></div>
+        <div class="it btn" onclick="toast('HWID restablecido')"><span class="k">RESTABLECER HWID</span><span class="v">›</span></div>
+      </div>
+
+      <div class="grp">
+        <div class="t">PREFERENCIAS</div>
+        <div class="it"><span class="l"><svg viewBox="0 0 24 24"><path d="M2.5 12s3.5-6 9.5-6 9.5 6 9.5 6-3.5 6-9.5 6-9.5-6-9.5-6z"/><circle cx="12" cy="12" r="2.6"/><path d="M4 4l16 16"/></svg></span>
+          <span style="flex:1"><b style="font-size:14px">Protección para revisión</b><span style="display:block;font-size:11px;color:#8d8d8d;margin-top:2px">Oculta el panel al grabar</span></span>
+          <button class="sw on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="it"><span class="l"><svg viewBox="0 0 24 24"><path d="M13 2.5L4 14h6l-1 7.5L20 9.5h-6z"/></svg></span>
+          <span style="flex:1"><b style="font-size:14px">Auto-inyección</b><span style="display:block;font-size:11px;color:#8d8d8d;margin-top:2px">Inyecta al abrir el juego</span></span>
+          <button class="sw" onclick="this.classList.toggle('on')"></button></div>
+        <div class="it"><span class="l"><svg viewBox="0 0 24 24"><path d="M11 5L6 9H3v6h3l5 4z"/><path d="M15.5 8.5a5 5 0 010 7"/></svg></span>
+          <span style="flex:1"><b style="font-size:14px">Sonidos del panel</b><span style="display:block;font-size:11px;color:#8d8d8d;margin-top:2px">Feedback al pulsar</span></span>
+          <button class="sw on" onclick="this.classList.toggle('on')"></button></div>
+        <div class="it"><span class="l"><svg viewBox="0 0 24 24"><path d="M18 8a6 6 0 10-12 0c0 7-3 8-3 8h18s-3-1-3-8"/><path d="M10.5 20a2 2 0 003 0"/></svg></span>
+          <span style="flex:1"><b style="font-size:14px">Notificaciones</b><span style="display:block;font-size:11px;color:#8d8d8d;margin-top:2px">Avisos de vencimiento</span></span>
+          <button class="sw" onclick="this.classList.toggle('on')"></button></div>
+        <div class="it btn" onclick="toast('Buscando actualizaciones…')"><span class="k">BUSCAR ACTUALIZACIONES</span><span class="v">4.3.0 ›</span></div>
+      </div>
+
+      <button class="dng" onclick="logout()">CERRAR SESIÓN</button>
+    </div>
+  </div>
+
+  <div class="toast" id="toast"></div>
+</div>
+
+<script>
+const DATA=[
+ [['AIMBOT CABEZA','Usar Metodo | Avatar (BR-DECLA)'],['AIMBOT CUELLO','Usar Metodo | Avatar (BR-DECLA)'],['AIMBOT PECHO DISIMULADO','Usar Metodo | Avatar (BR-DECLA)'],['BALAS MAGICAS','Usar Metodo | Avatar (BR-DECLA)']],
+ [['HOLOGRAMA ARMAS | ROBO...','Activar En 40% De Carga Del Juego'],['HOLOGRAMA ARMAS | CIAL','Activar En 40% De Carga Del Juego'],['HOLOGRAMA ARMAS | CHEAT','Activar En 40% De Carga Del Juego']],
+ [['144 FPS | 120','ACTIVAR ANTES DE ENTRAR AL JUEGO'],['AIMBOT CABEZA + ANTENA','Usar Metodo | Avatar (BR-DECLA)'],['AIMBOT CUELLO + ANTENA','Usar Metodo | Avatar (BR-DECLA)'],['AIMBOT PECHO DISI. + ANTENA','Usar Metodo | Avatar (BR-DECLA)']]
+];
+const $=id=>document.getElementById(id);
+
+/* ====== PUENTE XITFORGE · debe ser IDÉNTICO en windir.html ====== */
+const XF_SECRET='XITFORGE::forge::v1::2026::';
+const XF_B32='0123456789ABCDEFGHJKMNPQRSTVWXYZ';
+const XF_ENC=new TextEncoder();
+
+function xfB32(bytes){
+  let bits=0,val=0,out='';
+  for(const b of bytes){
+    val=(val<<8)|b;bits+=8;
+    while(bits>=5){out+=XF_B32[(val>>>(bits-5))&31];bits-=5;}
+  }
+  if(bits>0)out+=XF_B32[(val<<(5-bits))&31];
+  return out;
+}
+function xfUnb32(s){
+  const out=[];let bits=0,val=0;
+  for(const ch of s.toUpperCase()){
+    const i=XF_B32.indexOf(ch);
+    if(i<0)continue;
+    val=(val<<5)|i;bits+=5;
+    if(bits>=8){out.push((val>>>(bits-8))&255);bits-=8;}
+  }
+  return out;
+}
+async function xfSign(payload){
+  const k=await crypto.subtle.importKey('raw',XF_ENC.encode(XF_SECRET),{name:'HMAC',hash:'SHA-256'},false,['sign']);
+  const s=await crypto.subtle.sign('HMAC',k,XF_ENC.encode(payload));
+  return xfB32(new Uint8Array(s).slice(0,4)).slice(0,6);
+}
+async function xfMake(dias){
+  const b=new Uint8Array(6);
+  b[0]=1;
+  b[1]=(dias>>8)&255;
+  b[2]=dias&255;
+  crypto.getRandomValues(b.subarray(3));
+  const p=xfB32(b);
+  return 'XITF-'+p+'-'+await xfSign(p);
+}
+async function xfCheck(key){
+  const parts=String(key).toUpperCase().split('-');
+  if(parts.length!==3||parts[0]!=='XITF')return null;
+  const p=parts[1],s=parts[2];
+  if(!/^[0-9A-Z]{10}$/.test(p)||!/^[0-9A-Z]{6}$/.test(s))return null;
+  if(await xfSign(p)!==s)return null;
+  const by=xfUnb32(p);
+  if(by.length<3||by[0]!==1)return null;
+  return {dias:(by[1]<<8)|by[2]};
+}
+/* ====== fin puente ====== */
+
+const MASTER='XITFORGE';
+const MAX_TRIES=5, LOCK_MS=30000;
+
+let cur=0,sel=null,logged=false,genKey_=null,genDias=30,lockT=null;
+
+const norm=v=>String(v).toUpperCase().replace(/[^A-Z0-9]/g,'');
+const hyph=v=>norm(v).replace(/(.{4})/g,'$1-').replace(/-$/,'');
+const KEYS=()=>{try{const a=JSON.parse(localStorage.getItem('xf_keys')||'[]');return Array.isArray(a)?a:[]}catch(e){return[]}};
+const saveKeys=a=>localStorage.setItem('xf_keys',JSON.stringify(a.slice(0,200)));
+
+if(!localStorage.getItem('xf_start'))localStorage.setItem('xf_start',Date.now());
+
+(function importar(){
+  let ext=[];
+  try{ext=JSON.parse(localStorage.getItem('xf_issued')||'[]')}catch(e){}
+  if(!Array.isArray(ext)||!ext.length)return;
+  const ya=new Set(KEYS().map(k=>k.k));
+  const nuevos=ext.filter(x=>x&&x.k&&!ya.has(x.k)).map(x=>({k:x.k,d:Number(x.d)||0,t:Number(x.t)||Date.now()}));
+  if(!nuevos.length)return;
+  saveKeys([...nuevos,...KEYS()]);
+  localStorage.removeItem('xf_issued');
+})();
+
+$('key').addEventListener('input',e=>{
+  const r=norm(e.target.value).slice(0,20);
+  let out=r.slice(0,4);
+  if(r.length>8){
+    out=r.slice(0,4)+'-'+r.slice(4,14);
+    if(r.length>14)out+='-'+r.slice(14,20);
+  }
+  e.target.value=out;
+});
+$('key').addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();enter()}});
+
+const isLocked=()=>Number(localStorage.getItem('xf_lock')||0)>Date.now();
+
+function lockTick(){
+  clearInterval(lockT);
+  const run=()=>{
+    const left=Number(localStorage.getItem('xf_lock')||0)-Date.now();
+    if(left>0){
+      $('go').disabled=true;
+      $('hint').textContent='Bloqueado · '+Math.ceil(left/1000)+'s';
+    }else{
+      clearInterval(lockT);
+      $('go').disabled=false;
+      $('hint').textContent='Acceso restringido';
+    }
+  };
+  run();
+  if(isLocked())lockT=setInterval(run,1000);
+}
+
+function fail(msg){
+  const k=$('key');
+  k.classList.remove('good');
+  k.classList.add('bad');
+  setTimeout(()=>k.classList.remove('bad'),420);
+  const t=Number(localStorage.getItem('xf_tries')||0)+1;
+  if(t>=MAX_TRIES){
+    localStorage.setItem('xf_tries','0');
+    localStorage.setItem('xf_lock',Date.now()+LOCK_MS);
+    toast('Demasiados intentos · 30s');
+    lockTick();
+  }else{
+    localStorage.setItem('xf_tries',t);
+    $('hint').textContent=msg+' · '+(MAX_TRIES-t)+' intento'+((MAX_TRIES-t)===1?'':'s');
+    toast(msg);
+  }
+}
+
+async function enter(){
+  if(isLocked()){toast('Espera el bloqueo');return}
+  const raw=norm($('key').value);
+  if(raw.length<6){fail('Key incompleta');return}
+  if(raw===MASTER){abrir(MASTER,0);return}
+  const info=await xfCheck(raw);
+  if(!info){fail('Key no válida');return}
+  abrir(hyph(raw),info.dias);
+}
+
+function abrir(key,dias){
+  const previo=localStorage.getItem('xf_key');
+  localStorage.setItem('xf_key',key);
+  localStorage.setItem('xf_days',String(dias));
+  if(previo!==key||!localStorage.getItem('xf_start'))localStorage.setItem('xf_start',Date.now());
+  localStorage.setItem('xf_tries','0');
+  logged=true;
+  $('key').classList.remove('bad');
+  $('key').classList.add('good');
+  $('hint').textContent='Acceso restringido';
+  if(KEYS().some(k=>k.k===key))saveKeys(KEYS().map(k=>k.k===key?{...k,used:Date.now()}:k));
+  show('ver');
+}
+
+async function makeKey(){
+  const k=await xfMake(genDias);
+  genKey_=k;
+  saveKeys([{k,d:genDias,t:Date.now()},...KEYS()]);
+  try{
+    const ext=JSON.parse(localStorage.getItem('xf_issued')||'[]');
+    localStorage.setItem('xf_issued',JSON.stringify([{k,d:genDias,t:Date.now()},...(Array.isArray(ext)?ext:[])].slice(0,200)));
+  }catch(e){}
+  $('gout').textContent=k;
+  $('gout').classList.remove('empty');
+  renderHist();
+  toast('Key generada · '+(genDias?genDias+'d':'permanente'));
+}
+
+function openGen(){
+  if(!genKey_)makeKey();
+  show('gen');
+  renderHist();
+}
+
+function copyGen(){
+  if(!genKey_){makeKey();return}
+  navigator.clipboard?.writeText(genKey_);
+  toast('Key copiada');
+}
+
+async function useGen(){
+  if(!genKey_)await makeKey();
+  $('key').value=genKey_;
+  show('login');
+  setTimeout(enter,90);
+}
+
+function renderHist(){
+  const a=KEYS();
+  $('hlbl').textContent='Emitidas · '+a.length;
+  $('hrows').innerHTML = a.length
+    ? a.map((k,i)=>`<div class="hrow"><span class="k">${k.k}</span>
+        <span class="d">${k.d?k.d+'d':'perm'}</span>
+        <button onclick="cpKey('${k.k}')">COPIAR</button>
+        <button class="del" onclick="delKey(${i})">✕</button></div>`).join('')
+    : '<div class="hempty">Sin keys emitidas</div>';
+}
+
+function cpKey(k){navigator.clipboard?.writeText(k);toast('Key copiada')}
+
+function delKey(i){
+  const a=KEYS();
+  a.splice(i,1);
+  saveKeys(a);
+  renderHist();
+  toast('Key eliminada');
+}
+
+function clearKeys(){
+  if(!KEYS().length){toast('No hay keys');return}
+  saveKeys([]);
+  renderHist();
+  toast('Historial borrado');
+}
+
+function draw(){
+  $('rows').innerHTML=DATA[cur].map((r,k)=>`<button class="row" data-k="${k}" onclick="pick(${k},this)">
+    <span class="dot"></span><span class="tx"><b>${r[0]}</b><span>${r[1]}</span></span>
+    <span class="rad"><i></i></span></button>`).join('');
+  sel=null;$('act').classList.remove('on');$('act').textContent='ACTIVAR';
+}
+draw();
+
+function markDock(id){
+  ['dc','dt','dg'].forEach(x=>$(x).classList.remove('on'));
+  if(id)$(id).classList.add('on');
+}
+
+function show(id){
+  document.querySelectorAll('.scr').forEach(s=>s.classList.remove('on'));
+  $('s-'+id).classList.add('on');
+
+  const sub = id==='cheat'||id==='gen';
+  $('back').style.display = sub?'grid':'none';
+  $('ttl').style.display  = sub?'block':'none';
+  $('gear').style.display = id==='ver'?'block':'none';
+  $('lang').style.display = id==='login'?'flex':'none';
+  $('dock').style.display = (logged && id!=='login' && id!=='gen')?'flex':'none';
+
+  if(id==='gen')$('ttl').textContent='Generador';
+  if(id==='login'||id==='ver')$('ttl').textContent='';
+
+  markDock(id==='login'||id==='gen'?null:'dc');
+  if(id==='ver'&&logged)paint();
+}
+
+function back(){
+  if($('s-gen').classList.contains('on')){ logged?show('ver'):show('login'); return }
+  home();
+}
+
+function home(){show('ver');$('ttl').textContent=''}
+function control(){markDock('dc');home()}
+function tunel(){markDock('dt');toast('Túnel · pendiente de configurar')}
+function conf(){markDock('dg');sheet(true)}
+function openCheats(g){$('ttl').textContent=g;show('cheat');draw()}
+function tab(i,el){cur=i;[...$('tabs').children].forEach(b=>b.classList.remove('on'));el.classList.add('on');draw()}
+function pick(k,el){
+  document.querySelectorAll('.row').forEach(r=>r.classList.remove('on'));
+  el.classList.add('on');sel=k;$('act').classList.add('on');
+}
+function off(){
+  document.querySelectorAll('.row').forEach(r=>r.classList.remove('on'));
+  sel=null;$('act').classList.remove('on');toast('Opciones desactivadas');
+}
+$('act').onclick=()=>{if(sel===null){toast('Selecciona una opción');return}
+  toast(DATA[cur][sel][0]+' activado')};
+
+[...$('gdur').children].forEach(b=>b.onclick=()=>{
+  [...$('gdur').children].forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  genDias=Number(b.dataset.dd);
+});
+
+function menu(){$('menu').classList.toggle('on')}
+function setLang(v,el){
+  $('langT').textContent=v;$('menu').classList.remove('on');
+  document.querySelectorAll('.menu .b').forEach(b=>b.style.outline='none');
+  el.querySelector('.b').style.outline='2px solid #fff';
+}
+document.addEventListener('click',e=>{
+  if(!$('menu').contains(e.target)&&!$('lang').contains(e.target))$('menu').classList.remove('on');
+});
+
+function sheet(o){
+  $('mask').classList.toggle('on',o);
+  if(!o&&logged)markDock('dc');
+}
+$('mask').addEventListener('click',e=>{if(e.target===$('mask'))sheet(false)});
+
+function paint(){
+  const key=localStorage.getItem('xf_key')||'—';
+  const dias=Number(localStorage.getItem('xf_days')||0);
+  const st=Number(localStorage.getItem('xf_start'))||Date.now();
+  $('ukey').textContent=key;
+  $('ustart').textContent=fmt(st);
+  $('uplan').textContent=dias?dias+' días':'Permanente';
+  $('utier').textContent=dias?'XITFORGE · KEY':'XITFORGE · PERM';
+
+  if(!dias){
+    $('uend').textContent='Permanente';
+    $('udays').textContent='Permanente';
+    $('upct').textContent='∞';
+    $('ubar').style.width='100%';
+    $('ust').textContent='ACTIVA';
+    $('ust').style.color='#4ade80';
+    return;
+  }
+  const ex=st+dias*864e5;
+  const left=Math.max(0,ex-Date.now());
+  const d=Math.ceil(left/864e5);
+  const p=Math.max(0,Math.min(100,Math.round(left/(dias*864e5)*100)));
+  $('uend').textContent=fmt(ex);
+  $('udays').textContent=d>0?d+' días':'Vencida';
+  $('upct').textContent=p+'%';
+  $('ubar').style.width=p+'%';
+  $('ust').textContent=d<=0?'VENCIDA':d<=7?'POR VENCER':'ACTIVA';
+  $('ust').style.color=d<=7?'#ffb3ae':'#4ade80';
+}
+function fmt(t){const x=new Date(t);return String(x.getDate()).padStart(2,'0')+'/'+String(x.getMonth()+1).padStart(2,'0')+'/'+x.getFullYear()}
+function copyKey(){navigator.clipboard?.writeText(localStorage.getItem('xf_key')||'');toast('Key copiada')}
+
+function logout(){
+  localStorage.removeItem('xf_start');
+  localStorage.removeItem('xf_key');
+  localStorage.removeItem('xf_days');
+  logged=false;genKey_=null;
+  sheet(false);
+  show('login');
+  $('key').value='';
+  $('key').classList.remove('good','bad');
+  $('gout').textContent='Sin generar';
+  $('gout').classList.add('empty');
+  $('hint').textContent='Acceso restringido';
+  lockTick();
+  toast('Sesión cerrada');
+}
+
+let tT;
+function toast(m){const t=$('toast');t.textContent=m;t.classList.add('on');
+  clearTimeout(tT);tT=setTimeout(()=>t.classList.remove('on'),1800)}
+
+lockTick();
+</script>
+</body>
+</html>
