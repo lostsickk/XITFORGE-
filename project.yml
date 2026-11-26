@@ -12,15 +12,15 @@ targets:
     type: application
     platform: iOS
     sources:
-      - path: XITFORGE/Sources
-      - path: XITFORGE/web
+      - path: Sources
+      - path: web
         type: folder
-      - path: XITFORGE/Assets.xcassets
+      - path: Assets.xcassets
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.xitforge.panel
         PRODUCT_NAME: XITFORGE
-        INFOPLIST_FILE: XITFORGE/Info.plist
+        INFOPLIST_FILE: Info.plist
         MARKETING_VERSION: "4.3.0"
         CURRENT_PROJECT_VERSION: "1"
         TARGETED_DEVICE_FAMILY: "1"
