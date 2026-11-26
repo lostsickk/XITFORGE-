@@ -1,0 +1,34 @@
+name: build-ipa
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - name: Instalar XcodeGen
+        run: brew install xcodegen
+      - name: Generar proyecto
+        run: xcodegen generate
+      - name: Compilar
+        run: |
+          xcodebuild -project XITFORGE.xcodeproj -scheme XITFORGE \
+            -configuration Release -sdk iphoneos -derivedDataPath build \
+            CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO CODE_SIGNING_ALLOWED=NO
+      - name: Empaquetar ipa
+        run: |
+          mkdir -p Payload
+          cp -R build/Build/Products/Release-iphoneos/XITFORGE.app Payload/
+          rm -rf Payload/XITFORGE.app/_CodeSignature
+          zip -qry XITFORGE.ipa Payload
+          ls -lh XITFORGE.ipa
+      - name: Publicar
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: build-${{ github.run_number }}
+          name: XITFORGE build ${{ github.run_number }}
+          files: XITFORGE.ipa
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
