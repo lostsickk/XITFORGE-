@@ -391,7 +391,6 @@ nav button.on .bar{background:var(--acc);width:26px;animation:pop .3s ease}
 .cardprev .num{font-family:ui-monospace,monospace;font-size:15px;letter-spacing:.14em;color:#e8e8f0}
 .cardprev .ft{display:flex;justify-content:space-between;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#9a9aa6;margin-top:12px}
 
-/* === XITFORGE === */
 .dest{display:flex;gap:6px;background:#0d0d0d;border:1px solid #202020;padding:5px;border-radius:14px;max-width:340px}
 .dest button{flex:1;border:none;background:none;color:#8f8f8f;font-size:12px;font-weight:500;padding:10px;border-radius:10px;cursor:pointer;font-family:inherit;transition:.18s}
 .dest button.on{background:var(--accSoft);color:var(--accTxt);font-weight:600}
@@ -748,7 +747,7 @@ nav button.on .bar{background:var(--acc);width:26px;animation:pop .3s ease}
           <button class="on" data-dest="windir">Windir · panel</button>
           <button data-dest="xf">XITFORGE</button>
         </div>
-        <div class="xfnote" id="xfNote" hidden>Las keys se firman con HMAC y sirven para entrar en XITFORGE. La duración del selector se graba dentro de la key.</div>
+        <div class="xfnote" id="xfNote" hidden>Key firmada con HMAC para entrar en XITFORGE. La duración del selector se graba dentro de la key. Revocar acá no la desactiva en la app.</div>
       </div>
       <div class="sec">
         <span class="sl">Duración</span>
@@ -768,25 +767,27 @@ nav button.on .bar{background:var(--acc);width:26px;animation:pop .3s ease}
         <div class="stepper"><button id="menos">−</button><input id="qty" type="number" inputmode="numeric" min="1" max="50" value="1"><button id="mas">+</button></div>
         <p class="note">Cada key generada consume 1 día de tu saldo.</p>
       </div>
-      <div class="sec">
+      <div class="sec" id="fmtSec">
         <span class="sl">Formato de key</span>
-        <label class="fl">Prefijo</label><input class="inp mono" id="prefix" value="Windir-" maxlength="14" spellcheck="false">
-        <label class="fl">Etiqueta</label>
-        <select class="sel" id="tagMode"><option value="auto">Según la duración</option><option value="manual">Escribir a mano</option></select>
-        <input class="inp mono" id="tag" value="day" maxlength="10" spellcheck="false" style="display:none;margin-top:8px">
-        <label class="fl">Longitud · <span id="lenV">16</span></label>
-        <input type="range" id="len" min="8" max="32" value="16">
-        <div class="rngval"><span>8</span><span>32</span></div>
-        <label class="fl">Separador</label>
-        <select class="sel" id="sep"><option value="-">Guion — Windir-day-xxxx</option><option value="_">Guion bajo</option><option value=".">Punto</option><option value="">Sin separador</option></select>
-        <label class="fl">Caracteres de la key</label>
-        <div class="stack" id="kpool">
-          <button class="sw on" data-c="up"><span class="st">Mayúsculas<small>A B C … Z</small></span><span class="tg"></span></button>
-          <button class="sw on" data-c="lo"><span class="st">Minúsculas<small>a b c … z</small></span><span class="tg"></span></button>
-          <button class="sw on" data-c="di"><span class="st">Números<small>0 1 2 … 9</small></span><span class="tg"></span></button>
-          <button class="sw amb"><span class="st">Evitar ambiguas<small>sin O 0 I l 1</small></span><span class="tg"></span></button>
+        <div id="fmtCtl">
+          <label class="fl">Prefijo</label><input class="inp mono" id="prefix" value="Windir-" maxlength="14" spellcheck="false">
+          <label class="fl">Etiqueta</label>
+          <select class="sel" id="tagMode"><option value="auto">Según la duración</option><option value="manual">Escribir a mano</option></select>
+          <input class="inp mono" id="tag" value="day" maxlength="10" spellcheck="false" style="display:none;margin-top:8px">
+          <label class="fl">Longitud · <span id="lenV">16</span></label>
+          <input type="range" id="len" min="8" max="32" value="16">
+          <div class="rngval"><span>8</span><span>32</span></div>
+          <label class="fl">Separador</label>
+          <select class="sel" id="sep"><option value="-">Guion — Windir-day-xxxx</option><option value="_">Guion bajo</option><option value=".">Punto</option><option value="">Sin separador</option></select>
+          <label class="fl">Caracteres de la key</label>
+          <div class="stack" id="kpool">
+            <button class="sw on" data-c="up"><span class="st">Mayúsculas<small>A B C … Z</small></span><span class="tg"></span></button>
+            <button class="sw on" data-c="lo"><span class="st">Minúsculas<small>a b c … z</small></span><span class="tg"></span></button>
+            <button class="sw on" data-c="di"><span class="st">Números<small>0 1 2 … 9</small></span><span class="tg"></span></button>
+            <button class="sw amb"><span class="st">Evitar ambiguas<small>sin O 0 I l 1</small></span><span class="tg"></span></button>
+          </div>
         </div>
-        <div class="prev"><b>Vista previa</b><span id="prevKey"></span></div>
+        <div class="prev" id="prevBox"><b>Vista previa</b><span id="prevKey"></span></div>
       </div>
       <div class="sec">
         <span class="sl">Credenciales</span>
@@ -1981,7 +1982,7 @@ $("#mPrecios").onclick = () => {
       '<p class="note">10 días = $' + precio(10) + ' · 20 días = $' + precio(20) + '</p>',
     onOk(){
       CFG.precioDia = Math.max(1, parseInt($("#pdia").value) || PRECIO_DIA);
-      guardar(); aplicarSesion(); calcDias(); calcMon(); calcReg(); cerrarModal(); toast("Precio actualizado");
+      guardar(); aplicarSesion(); calcMon(); calcReg(); cerrarModal(); toast("Precio actualizado");
     }
   });
 };
@@ -2277,6 +2278,7 @@ function renderComps(){
 }
 
 let dur = "1", sep = "-", tagMode = "auto", lote = [];
+let dest = localStorage.getItem("windir_dest_v1") || "windir";
 const poolOf = sel => {
   const amb = $(sel + " .amb").classList.contains("on");
   const cls = $$(sel + " .sw.on:not(.amb)").map(t => t.dataset.c);
@@ -2327,42 +2329,99 @@ $("#diceU").onclick = () => {
 };
 function render(){
   const b = $("#prevKey"); b.innerHTML = "";
+  if (dest === "xf"){
+    const s1 = document.createElement("span"); s1.textContent = "XITF-04";
+    const s2 = document.createElement("span"); s2.className = "r"; s2.textContent = "•".repeat(8);
+    const s3 = document.createElement("span"); s3.textContent = "-";
+    const s4 = document.createElement("span"); s4.className = "r"; s4.textContent = "•".repeat(6);
+    b.append(s1, s2, s3, s4);
+    return;
+  }
   const s1 = document.createElement("span"); s1.textContent = $("#prefix").value;
   const s2 = document.createElement("span"); s2.className = "t"; s2.textContent = tagOf();
   const s3 = document.createElement("span"); s3.textContent = sep;
   const s4 = document.createElement("span"); s4.className = "r"; s4.textContent = "•".repeat(+$("#len").value);
   b.append(s1, s2, s3, s4);
 }
-$("#gen").onclick = () => {
+function aplicarDest(){
+  $$("#destSel button").forEach(b => b.classList.toggle("on", b.dataset.dest === dest));
+  $("#xfNote").hidden = dest !== "xf";
+  $("#fmtCtl").style.display = dest === "xf" ? "none" : "";
+  $("#prevBox").style.display = dest === "xf" ? "" : "";
+  localStorage.setItem("windir_dest_v1", dest);
+  render();
+}
+$$("#destSel button").forEach(b => b.onclick = () => { dest = b.dataset.dest; aplicarDest(); });
+$("#dXf").onclick = () => { location.href = "index.html"; };
+
+/* ===== PUENTE XITFORGE · mismo secreto y algoritmo que index.html ===== */
+const XF_SECRET = "XITFORGE::forge::v1::2026::";
+const XF_B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+function xfB32(bytes){
+  let bits = 0, val = 0, out = "";
+  for (const b of bytes){ val = (val << 8) | b; bits += 8;
+    while (bits >= 5){ out += XF_B32[(val >>> (bits - 5)) & 31]; bits -= 5; } }
+  if (bits > 0) out += XF_B32[(val << (5 - bits)) & 31];
+  return out;
+}
+async function xfSign(payload){
+  const k = await crypto.subtle.importKey("raw", enc.encode(XF_SECRET), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
+  const s = await crypto.subtle.sign("HMAC", k, enc.encode(payload));
+  return xfB32(new Uint8Array(s).slice(0, 4)).slice(0, 6);
+}
+async function xfKey(dias){
+  const b = new Uint8Array(6);
+  b[0] = 1; b[1] = (dias >> 8) & 255; b[2] = dias & 255;
+  crypto.getRandomValues(b.subarray(3));
+  const p = xfB32(b);
+  return "XITF-" + p + "-" + await xfSign(p);
+}
+
+$("#gen").onclick = async () => {
   if (!puede("gen")) return toast("Tu cuenta no tiene permiso para generar keys.", true);
-  const kp = poolOf("#kpool"), pp = poolOf("#ppool");
-  if (!kp.str) return toast("Elegí caracteres para la key.", true);
-  if (!pp.str) return toast("Elegí caracteres para la contraseña.", true);
   const n = Math.max(1, Math.min(50, +$("#qty").value || 1));
-  if (!esOwner()){
-    const disp = misDias();
-    if (disp < n) return toast("Te faltan días: tenés " + disp + " y necesitás " + n + ". Comprá días.", true);
-  }
+  if (!esOwner() && misDias() < n) return toast("Te faltan días: tenés " + misDias() + " y necesitás " + n + ".", true);
+  const pp = poolOf("#ppool");
+  if (!pp.str) return toast("Elegí caracteres para la contraseña.", true);
+  if (dest === "xf" && !HAS_SUBTLE) return toast("Este navegador no puede firmar: hace falta HTTPS.", true);
+  const esXf = dest === "xf";
+  const kp = poolOf("#kpool");
+  if (!esXf && !kp.str) return toast("Elegí caracteres para la key.", true);
+  const dias = dur === "perm" ? 0 : dur === "custom" ? Math.max(1, parseInt($("#custDays").value) || 1) : (parseInt(dur) || 1);
   const len = +$("#len").value, pwlen = +$("#pwlen").value;
   const pfx = $("#prefix").value, t = tagOf();
   const rev = $("#rev").value, nota = $("#nota").value.trim();
   const ubase = ($("#ubase").value.trim() || "cliente").replace(/\s+/g, ".");
   const sfx = $("#suffix").classList.contains("on");
-  for (let i = 0; i < n; i++){
-    const o = {
-      k: pfx + t + sep + build(kp, len),
-      u: ubase + (sfx ? String(bytes(1)[0] % 900 + 100) : ""),
-      p: build(pp, pwlen), d: dur,
-      s: dur === "perm" ? "perm" : "act",
-      v: dur === "perm" ? "sin vencimiento" : (dur === "custom" ? "vence en " + (parseInt($("#custDays").value) || 0) + " días" : "recién creada"),
-      rev, nota
-    };
-    lote.unshift(o);
-    $("#out").prepend(card(o, true, borrarLote(o)));
+  const btn = $("#gen"); btn.classList.add("loading");
+  const nuevos = [];
+  try {
+    for (let i = 0; i < n; i++){
+      nuevos.push({
+        k: esXf ? await xfKey(dias) : pfx + t + sep + build(kp, len),
+        u: ubase + (sfx ? String(bytes(1)[0] % 900 + 100) : ""),
+        p: build(pp, pwlen), d: esXf ? (dias ? String(dias) : "perm") : dur,
+        s: (esXf ? dias === 0 : dur === "perm") ? "perm" : "act",
+        v: (esXf ? dias === 0 : dur === "perm") ? "sin vencimiento"
+          : "vence en " + (esXf ? dias : (parseInt($("#custDays").value) || 0)) + " días",
+        rev, nota
+      });
+    }
+  } catch(e){
+    btn.classList.remove("loading");
+    return toast("No se pudo firmar: " + e.message, true);
   }
+  btn.classList.remove("loading");
+  nuevos.forEach(o => {
+    lote.unshift(o);
+    const el = card(o, true, borrarLote(o));
+    if (esXf) el.querySelector(".km").insertAdjacentHTML("beforeend", '<span class="xfpill">XITFORGE</span>');
+    $("#out").prepend(el);
+  });
   if (!esOwner()){ USERS[SESION.user].dias = misDias() - n; guardar(); aplicarSesion(); }
   $("#empty").style.display = "none";
-  sync(); toast(n === 1 ? "Key generada · 1 día descontado" : n + " keys generadas · " + n + " días descontados");
+  sync();
+  toast(n === 1 ? "Key generada · 1 día descontado" : n + " keys generadas · " + n + " días descontados");
 };
 function borrarLote(o){
   return () => { lote = lote.filter(x => x !== o); sync(); if (!lote.length) $("#empty").style.display = "block"; };
@@ -2383,8 +2442,8 @@ function dl(n, t, m){
   setTimeout(() => URL.revokeObjectURL(a.href), 2000);
 }
 $("#expCsv").onclick = () => {
-  const head = "key,usuario,contrasena,duracion,revendedor,nota\n";
-  const rows = lote.map(o => [o.k,o.u,o.p,DURLBL(o.d),o.rev,o.nota]
+  const head = "producto,key,usuario,contrasena,duracion,revendedor,nota\n";
+  const rows = lote.map(o => [(o.d === "perm" && o.k.startsWith("XITF") ? "XITFORGE" : "Windir"), o.k, o.u, o.p, DURLBL(o.d), o.rev, o.nota]
     .map(v => '"' + String(v).replace(/"/g,'""') + '"').join(",")).join("\n");
   dl("windir-keys.csv", head + rows, "text/csv"); toast("CSV exportado");
 };
@@ -2436,13 +2495,13 @@ try {
   const s = JSON.parse(localStorage.getItem("windir_lote_v6") || "[]");
   if (Array.isArray(s) && s.length){
     lote = s;
-    s.slice().reverse().forEach(o => $("#out").prepend(card(o, false, borrarLote(o))));
+    s.slice().reverse().forEach(o => { o.prod = o.prod || "windir"; $("#out").prepend(card(o, false, borrarLote(o))); });
     $("#empty").style.display = "none";
   }
 } catch(e){}
 
 renderRevs(); renderVend(); renderComps(); renderApi(); renderAnuncios();
-aplicarSesion(); apply(); render(); sync(); go("login");
+aplicarSesion(); apply(); aplicarDest(); sync(); go("login");
 
 try {
   const s = JSON.parse(sessionStorage.getItem("windir_sess") || "null");
@@ -2453,77 +2512,6 @@ try {
 } catch(e){}
 
 if (!HAS_SUBTLE) toast("Modo sin cifrado fuerte: usá HTTPS", true);
-</script>
-
-<script>
-"use strict";
-/* ====== PUENTE XITFORGE · mismo secreto y algoritmo que index.html ====== */
-const XF_SECRET = "XITFORGE::forge::v1::2026::";
-const XF_B32 = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
-const XF_ENC = new TextEncoder();
-const xfB32 = bytes => {
-  let bits = 0, val = 0, out = "";
-  for (const b of bytes){ val = (val << 8) | b; bits += 8;
-    while (bits >= 5){ out += XF_B32[(val >>> (bits - 5)) & 31]; bits -= 5; } }
-  if (bits > 0) out += XF_B32[(val << (5 - bits)) & 31];
-  return out;
-};
-async function xfSign(payload){
-  const k = await crypto.subtle.importKey("raw", XF_ENC.encode(XF_SECRET), {name:"HMAC", hash:"SHA-256"}, false, ["sign"]);
-  const s = await crypto.subtle.sign("HMAC", k, XF_ENC.encode(payload));
-  return xfB32(new Uint8Array(s).slice(0, 4)).slice(0, 6);
-}
-async function xfKey(dias){
-  const b = new Uint8Array(6);
-  b[0] = 1; b[1] = (dias >> 8) & 255; b[2] = dias & 255;
-  crypto.getRandomValues(b.subarray(3));
-  const p = xfB32(b);
-  return "XITF-" + p + "-" + await xfSign(p);
-}
-function xfPush(k, dias){
-  let a = [];
-  try { a = JSON.parse(localStorage.getItem("xf_issued") || "[]"); } catch(e){}
-  if (!Array.isArray(a)) a = [];
-  localStorage.setItem("xf_issued", JSON.stringify([{k, d:dias, t:Date.now()}, ...a.filter(x => x.k !== k)].slice(0, 300)));
-}
-let dest = "windir";
-$$("#destSel button").forEach(b => b.onclick = () => {
-  $$("#destSel button").forEach(x => x.classList.toggle("on", x === b));
-  dest = b.dataset.dest;
-  $("#xfNote").hidden = dest !== "xf";
-});
-$("#dXf").onclick = () => { location.href = "index.html"; };
-const _xfGen = $("#gen").onclick;
-$("#gen").onclick = async () => {
-  if (dest !== "xf") return _xfGen();
-  if (!puede("gen")) return toast("Tu cuenta no tiene permiso para generar keys.", true);
-  const n = Math.max(1, Math.min(50, +$("#qty").value || 1));
-  if (!esOwner() && misDias() < n) return toast("Te faltan días: tenés " + misDias() + " y necesitás " + n + ".", true);
-  const dias = dur === "perm" ? 0 : dur === "custom" ? Math.max(1, parseInt($("#custDays").value) || 1) : (parseInt(dur) || 1);
-  const pp = poolOf("#ppool");
-  if (!pp.str) return toast("Elegí caracteres para la contraseña.", true);
-  const pwlen = +$("#pwlen").value;
-  const ubase = ($("#ubase").value.trim() || "cliente").replace(/\s+/g, ".");
-  const sfx = $("#suffix").classList.contains("on");
-  const rev = $("#rev").value, nota = $("#nota").value.trim();
-  for (let i = 0; i < n; i++){
-    const k = await xfKey(dias);
-    xfPush(k, dias);
-    const o = {
-      k, u: ubase + (sfx ? String(bytes(1)[0] % 900 + 100) : ""), p: build(pp, pwlen),
-      d: dias === 0 ? "perm" : dias, s: dias === 0 ? "perm" : "act",
-      v: dias === 0 ? "sin vencimiento" : "vence en " + dias + " días", rev, nota
-    };
-    lote.unshift(o);
-    const el = card(o, true, borrarLote(o));
-    el.querySelector(".km").insertAdjacentHTML("beforeend", '<span class="xfpill">XITFORGE</span>');
-    $("#out").prepend(el);
-  }
-  if (!esOwner()){ USERS[SESION.user].dias = misDias() - n; guardar(); aplicarSesion(); }
-  $("#empty").style.display = "none";
-  sync();
-  toast(n === 1 ? "Key XITFORGE generada" : n + " keys XITFORGE generadas");
-};
 </script>
 </body>
 </html>
